@@ -97,13 +97,22 @@ namespace Compushady
 #else
 				LibHandle = FPlatformProcess::GetDllHandle(*(FPaths::ProjectDir() / TEXT("Binaries/Win64/dxcompiler.dll")));
 #endif
-#elif PLATFORM_LINUX || PLATFORM_ANDROID
+#elif PLATFORM_LINUX 
+#if WITH_EDITOR
+				LibHandle = FPlatformProcess::GetDllHandle(*(FPaths::Combine(IPluginManager::Get().FindPlugin(TEXT("Compushady"))->GetBaseDir(), TEXT("Source/ThirdParty/dxc_2023_03_01_linux/lib/libdxcompiler.so"))));
+#else
+				LibHandle = FPlatformProcess::GetDllHandle(TEXT("libdxcompiler.so"));
+#endif
+#elif PLATFORM_ANDROID
 				LibHandle = FPlatformProcess::GetDllHandle(TEXT("libdxcompiler.so"));
 #elif PLATFORM_MAC
 				LibHandle = FPlatformProcess::GetDllHandle(TEXT("libdxcompiler.dylib"));
 #endif
 				if (!LibHandle)
 				{
+#if WITH_EDITOR
+					UE_LOG(LogTemp, Warning, TEXT("%s"), *(FPaths::Combine(IPluginManager::Get().FindPlugin(TEXT("Compushady"))->GetBaseDir(), TEXT("Source/ThirdParty/dxc_2023_03_01_linux/lib/libdxcompiler.so"))));
+#endif
 					UE_LOG(LogCompushady, Error, TEXT("Unable to load dxcompiler shared library"));
 					return false;
 				}
